@@ -12,8 +12,8 @@ import (
 )
 
 type site struct {
-	URL string `json:"url"`
-	ID  string `json:"id"`
+	URL  string `json:"url"`
+	UUID string `json:"uuid"`
 }
 
 // Concurrent requests
@@ -36,10 +36,10 @@ func getURLWorker(siteChan chan map[string]string) {
 			status = true
 		}
 
-		// url := "http://localhost:9000/" + s["id"]
-		url := "http://localhost:9000"
+		url := "http://localhost:9000/sites/" + s["uuid"]
+		// url := "http://localhost:9000"
 
-		var jsonStr = []byte(`{"status": ` + strconv.FormatBool(status) + `}`)
+		var jsonStr = []byte(`{"IsHealthy": ` + strconv.FormatBool(status) + `}`)
 		req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonStr))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -60,7 +60,7 @@ func getURLWorker(siteChan chan map[string]string) {
 
 func main() {
 
-	resp, err := http.Get("http://localhost:9000")
+	resp, err := http.Get("http://localhost:9000/sites")
 
 	if err != nil {
 		fmt.Printf("%s", err)

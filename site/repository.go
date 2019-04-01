@@ -7,6 +7,7 @@ import (
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
+	"github.com/google/uuid"
 )
 
 //Repository ...
@@ -14,20 +15,17 @@ type Repository struct {
 	s *mgo.Session
 }
 
-// SERVER the DB server
-const SERVER = "localhost:27017"
-
 // DBNAME the name of the DB instance
 const DBNAME = "health-check"
 
-// DOCNAME the name of the document
-const DOCNAME = "sites"
+// CNAME the name of the collection
+const CNAME = "sites"
 
 // GetSites returns the list of Sites
 func (r Repository) GetSites() Sites {
-	c := r.s.DB(DBNAME).C(DOCNAME)
+	c := r.s.DB(DBNAME).C(CNAME)
 	results := Sites{}
-	if err := c.Find(nil).All(&results); err != nil {
+	if err := c.Find(nil).Sort("updatedAt").All(&results); err != nil {
 		fmt.Println("Failed to write results:", err)
 	}
 
@@ -38,9 +36,10 @@ func (r Repository) GetSites() Sites {
 func (r Repository) AddSite(site Site) bool {
 
 	site.ID = bson.NewObjectId()
+	site.UUID = uuid.New().String()
 	site.CreatedAt = time.Now()
 	site.UpdatedAt = time.Now()
-	err := r.s.DB(DBNAME).C(DOCNAME).Insert(site)
+	err := r.s.DB(DBNAME).C(CNAME).Insert(site)
 
 	fmt.Printf("%v", site)
 
@@ -51,10 +50,10 @@ func (r Repository) AddSite(site Site) bool {
 	return true
 }
 
-// UpdateSite updates an Site in the DB
+// PatchSite updates an Site in the DB
 func (r Repository) PatchSite(match map[string]interface{}, update map[string]interface{}) bool {
 
-	err := r.s.DB(DBNAME).C(DOCNAME).Update(match, update)
+	err := r.s.DB(DBNAME).C(CNAME).Update(match, update)
 
 	if err != nil {
 		log.Fatal(err)
@@ -66,16 +65,8 @@ func (r Repository) PatchSite(match map[string]interface{}, update map[string]in
 // DeleteSite deletes an Site
 func (r Repository) DeleteSite(id string) string {
 
-	// Verify id is ObjectId, otherwise bail
-	if !bson.IsObjectIdHex(id) {
-		return "404"
-	}
-
-	// Grab id
-	oid := bson.ObjectIdHex(id)
-
 	// Remove user
-	if err := r.s.DB(DBNAME).C(DOCNAME).RemoveId(oid); err != nil {
+	if err := r.s.DB(DBNAME).C(CNAME).Remove(bson.M{"uuid": id}); err != nil {
 		log.Fatal(err)
 		return "500"
 	}

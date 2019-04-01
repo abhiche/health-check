@@ -40,13 +40,13 @@ func NewRouter(s *mgo.Session) *mux.Router {
 		Route{
 			"PatchSite",
 			"PATCH",
-			"/sites",
+			"/sites/{id}",
 			controller.PatchSite,
 		},
 		Route{
 			"DeleteSite",
 			"DELETE",
-			"/sites",
+			"/sites/{id}",
 			controller.DeleteSite,
 		},
 	}

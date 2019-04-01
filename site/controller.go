@@ -2,6 +2,7 @@ package site
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -85,7 +86,9 @@ func (c *Controller) PatchSite(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	success := c.Repository.PatchSite(bson.M{"_id": id}, bson.M{"$set": &site}) // adds the site to the DB
+	print("uuid: ", id)
+	fmt.Printf("site: %v", site)
+	success := c.Repository.PatchSite(bson.M{"uuid": id}, bson.M{"$set": &site}) // adds the site to the DB
 	if !success {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
