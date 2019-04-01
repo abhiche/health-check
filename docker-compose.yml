@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  web:
+    build: .
+    links:
+      - mongo
+    restart: on-failure
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URL: "mongodb://mongo:27017/health-check"
+    ports:
+      - "9000:9000"
+    hostname: web
+  mongo:
+    image: mongo
+    hostname: mongo
+    ports:
+      - "27017:27017"
