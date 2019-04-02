@@ -1,7 +1,9 @@
 version: "3.3"
 services:
   web:
-    build: ./build/package/docker/web
+    build:
+      context: ./
+      dockerfile: ./build/package/docker/web/Dockerfile
     links:
       - mongo
     restart: on-failure
@@ -18,7 +20,9 @@ services:
     ports:
       - "27017:27017"
   prober:
-    build: ./build/package/docker/prober
+    build:
+      context: ./
+      dockerfile: ./build/package/docker/prober/Dockerfile
     links:
       - web
     restart: on-failure

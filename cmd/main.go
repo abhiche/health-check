@@ -8,11 +8,17 @@ import (
 	"github.com/globalsign/mgo"
 	"github.com/gorilla/handlers"
 
-	"github.com/abhiche/health-check/site"
+	"github.com/abhiche/health-check/pkg/site"
 )
 
+var mongoURL = "MONGO_URL"
+
 func main() {
-	session, err := mgo.Dial(os.Getenv("MONGO_URL"))
+	var connString = os.Getenv(mongoURL)
+	if connString == "" {
+		panic("Missing env var " + mongoURL)
+	}
+	session, err := mgo.Dial(os.Getenv(mongoURL))
 	if err != nil {
 		panic(err)
 	}

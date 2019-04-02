@@ -3,7 +3,7 @@ package site
 import (
 	"net/http"
 
-	"github.com/abhiche/health-check/logger"
+	"github.com/abhiche/health-check/pkg/logger"
 	"github.com/globalsign/mgo"
 
 	"github.com/gorilla/mux"

@@ -18,6 +18,11 @@ type Controller struct {
 	Repository Repository
 }
 
+type ErrorMessage struct {
+	Code string `json:"code"`
+	Msg  string `json:"msg"`
+}
+
 // Index GET /
 func (c *Controller) Index(w http.ResponseWriter, r *http.Request) {
 	sites := c.Repository.GetSites() // list of all sites
@@ -51,6 +56,22 @@ func (c *Controller) AddSite(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	print("IsValidRequestURL(site.URL)", IsValidRequestURL(site.URL))
+	if IsValidRequestURL(site.URL) == false {
+		w.WriteHeader(http.StatusBadRequest)
+		data := &ErrorMessage{
+			Code: "F1",
+			Msg:  "Invalid url received",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		resJSON, err := json.Marshal(data)
+		if err != nil {
+			log.Fatalln("Error AddSite marshalling response", err)
+		}
+		w.Write(resJSON)
+		return
+	}
+
 	success := c.Repository.AddSite(site) // adds the site to the DB
 	if !success {
 		w.WriteHeader(http.StatusInternalServerError)

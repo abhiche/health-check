@@ -1,0 +1,1 @@
+* * * * *  ./go/src/health-check/prober/prober >> /test_file 2>&1
