@@ -12,7 +12,7 @@ After this head on to [webpage](http://localhost:9000/web/)
 
 ## Note
 
-The cron job is set to run every 5 minutes. You may change it in internal/prober/cronjobs
+The cron job is set to run every 5 minutes. You may change it in [here](https://github.com/abhiche/health-check/blob/master/internal/prober/cronjobs)
 
 ## Todo
 
