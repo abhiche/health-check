@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 )
@@ -18,6 +19,8 @@ type site struct {
 
 // Concurrent requests
 const workersCount = 10
+
+var baseURL = os.Getenv("BASE_URL")
 
 func getURLWorker(siteChan chan map[string]string) {
 	for s := range siteChan {
@@ -36,14 +39,11 @@ func getURLWorker(siteChan chan map[string]string) {
 			status = true
 		}
 
-		url := "http://localhost:9000/sites/" + s["uuid"]
-		// url := "http://localhost:9000"
+		url := baseURL + s["uuid"]
 
 		var jsonStr = []byte(`{"IsHealthy": ` + strconv.FormatBool(status) + `}`)
 		req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonStr))
 		req.Header.Set("Content-Type", "application/json")
-
-		print("patching")
 
 		client := &http.Client{}
 		resp, err = client.Do(req)
@@ -60,7 +60,11 @@ func getURLWorker(siteChan chan map[string]string) {
 
 func main() {
 
-	resp, err := http.Get("http://localhost:9000/sites")
+	if baseURL == "" {
+		panic("BASE_URL env var not configured properly")
+	}
+
+	resp, err := http.Get(baseURL)
 
 	if err != nil {
 		fmt.Printf("%s", err)

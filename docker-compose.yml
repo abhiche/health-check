@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   web:
-    build: .
+    build: ./build/package/docker/web
     links:
       - mongo
     restart: on-failure
@@ -17,3 +17,12 @@ services:
     hostname: mongo
     ports:
       - "27017:27017"
+  prober:
+    build: ./build/package/docker/prober
+    links:
+      - web
+    restart: on-failure
+    depends_on:
+      - web
+    environment:
+      BASE_URL: "http://web:9000/sites/"
