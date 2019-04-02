@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 )
 
 type site struct {
@@ -20,12 +21,18 @@ type site struct {
 // Concurrent requests
 const workersCount = 10
 
+const healthCheckTimeout = 800 * time.Millisecond
+
 var baseURL = os.Getenv("BASE_URL")
 
 func getURLWorker(siteChan chan map[string]string) {
 	for s := range siteChan {
 		println(s["url"])
-		resp, err := http.Get(s["url"])
+		timeout := time.Duration(healthCheckTimeout)
+		client := http.Client{
+			Timeout: timeout,
+		}
+		resp, err := client.Get(s["url"])
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/globalsign/mgo"
 	"github.com/gorilla/handlers"
@@ -12,9 +13,14 @@ import (
 )
 
 var mongoURL = "MONGO_URL"
+var defaultPort = "9000"
 
 func main() {
 	var connString = os.Getenv(mongoURL)
+	var port = os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
+	}
 	if connString == "" {
 		panic("Missing env var " + mongoURL)
 	}
@@ -27,7 +33,15 @@ func main() {
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "PATCH"})
 
+	s := &http.Server{
+		Addr:           ":" + port,
+		Handler:        router,
+		ReadTimeout:    10 * time.Minute,
+		WriteTimeout:   10 * time.Minute,
+		MaxHeaderBytes: 0,
+	}
+
 	// launch server
-	log.Fatal(http.ListenAndServe(":9000",
-		handlers.CORS(allowedOrigins, allowedMethods)(router)))
+	log.Fatal(s.ListenAndServe(),
+		handlers.CORS(allowedOrigins, allowedMethods)(router))
 }
