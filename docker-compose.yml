@@ -1,6 +1,7 @@
 version: "3.3"
 services:
   web:
+    image: web
     build:
       context: ./
       dockerfile: ./build/package/docker/web/Dockerfile
@@ -20,6 +21,7 @@ services:
     ports:
       - "27017:27017"
   prober:
+    image: prober
     build:
       context: ./
       dockerfile: ./build/package/docker/prober/Dockerfile

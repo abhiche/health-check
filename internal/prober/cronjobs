@@ -1,1 +1,1 @@
-* * * * *  ./go/src/health-check/prober >> /test_file 2>&1
+*/5 * * * *  /go/src/health-check/prober >> /log_file 2>&1
