@@ -1,0 +1,95 @@
+swagger: "2.0"
+info:
+  version: 0.0.1
+  title: Simple To Do List API
+schemes:
+  - http
+paths:
+  /sites:
+    get:
+      tags: ["sites"]
+      operationId: find
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/item"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    post:
+      tags: ["sites"]
+      operationId: addOne
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/item"
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: "#/definitions/item"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+  /sites/{uuid}:
+    patch:
+      parameters:
+        - type: string
+          name: uuid
+          in: path
+          required: true
+      tags: ["sites"]
+      operationId: destroyOne
+      responses:
+        "204":
+          description: Deleted
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+    delete:
+      parameters:
+        - type: string
+          name: uuid
+          in: path
+          required: true
+      tags: ["sites"]
+      operationId: destroyOne
+      responses:
+        "204":
+          description: Deleted
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/error"
+definitions:
+  item:
+    type: object
+    required:
+      - url
+    properties:
+      id:
+        type: string
+      uuid:
+        type: string
+      url:
+        type: string
+      createdAt:
+        type: string
+      updatedAt:
+        type: string
+  error:
+    type: object
+    required:
+      - message
+    properties:
+      code:
+        type: string
+      message:
+        type: string
