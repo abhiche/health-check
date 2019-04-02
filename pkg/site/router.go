@@ -17,6 +17,8 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
+var staticDir = "/web/"
+
 //NewRouter configures a new router to the API
 func NewRouter(s *mgo.Session) *mux.Router {
 	var controller = &Controller{Repository: Repository{s}}
@@ -51,6 +53,9 @@ func NewRouter(s *mgo.Session) *mux.Router {
 		},
 	}
 	router := mux.NewRouter().StrictSlash(true)
+	router.
+		PathPrefix(staticDir).
+		Handler(http.StripPrefix(staticDir, http.FileServer(http.Dir("."+staticDir))))
 	for _, route := range routes {
 		var handler http.Handler
 		handler = route.HandlerFunc

@@ -12,7 +12,7 @@ RUN git config --global url."git://".insteadOf https://
 # Build the outyet command inside the container.
 # (You may fetch or manage dependencies here,
 # either manually or with a tool like "godep".)
-RUN go get github.com/abhiche/health-check/internal/site && \
+RUN go get github.com/abhiche/health-check/pkg/site && \
   go get  github.com/gorilla/mux && \
   go get github.com/gorilla/handlers && \
   go get github.com/globalsign/mgo && \

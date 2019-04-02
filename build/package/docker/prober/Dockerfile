@@ -5,16 +5,16 @@ RUN apk --update add --no-cache git
 ENV GOPATH /go
 # Copy the local package files to the container's workspace.
 
-ADD . /go/src/health-check/prober
-WORKDIR /go/src/health-check/prober
+ADD . /go/src/health-check
+WORKDIR /go/src/health-check
 
 # copy crontabs for root user
 RUN echo "$WORKDIR"
-COPY $WORKDIR/prober/cronjobs /etc/crontabs/root
+COPY $WORKDIR/internal/prober/cronjobs /etc/crontabs/root
 
 RUN git config --global url."git://".insteadOf https://
 
-RUN go build ./prober
+RUN go build ./internal/prober
 
 RUN chmod +x ./prober
 
