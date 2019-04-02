@@ -1,6 +1,8 @@
 <html>
   <head>
     <title>Health Check Portal</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -20,20 +22,32 @@
       line-height: 60px;
       background-color: #f5f5f5;
     }
+    .header {
+      background: aliceblue;
+      text-align: center;
+    }
+    .row {
+      padding: 10px 0;
+    }
   </style>
   <script src="app.js"></script>
   <script src="//cdn.bootcss.com/timeago.js/4.0.0-beta.2/timeago.min.js"></script>
   <body>
     <div class="alert alert-danger hide" id="alert" role="alert"></div>
     <div class="container">
-      <div class="row">
-        <div class="col-sm">
+      <div class="header row">
+        <div class="col-md-4">
           Check
         </div>
-        <div class="col-sm">
-          <input id="urlText" type="text" placeholder="Enter url here" />
+        <div class="col-md-6">
+          <input
+            id="urlText"
+            type="text"
+            class="form-control"
+            placeholder="Enter url of the site to add"
+          />
         </div>
-        <div class="col-sm">
+        <div class="col-md-2">
           <button
             id="submit-btn"
             class="btn btn-primary"

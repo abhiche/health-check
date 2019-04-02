@@ -1,8 +1,11 @@
 var baseURL = location.protocol + "//" + location.host + "/sites";
-loadSites();
-setInterval(function() {
+
+document.addEventListener("DOMContentLoaded", function() {
   loadSites();
-}, 60000);
+  setInterval(function() {
+    loadSites();
+  }, 60000);
+});
 
 function isValidUrl(url) {
   return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/.exec(
@@ -13,17 +16,19 @@ function isValidUrl(url) {
 }
 
 function showAlert(text) {
-  document.querySelector("#alert").classList.remove("hide");
-  document.querySelector("#alert").innerHTML = text;
-  setTimeout(function() {
-    document.querySelector("#alert").classList.add("hide");
-  }, 3000);
+  if (document.querySelector("#alert")) {
+    document.querySelector("#alert").classList.remove("hide");
+    document.querySelector("#alert").innerHTML = text;
+    setTimeout(function() {
+      document.querySelector("#alert").classList.add("hide");
+    }, 3000);
+  }
 }
 
 function addSite(e) {
   url = document.querySelector("#urlText").value;
   if (!isValidUrl(url)) {
-    showAlert("Please enter a valid url");
+    showAlert("Please enter a valid url like http://www.google.com");
     return;
   }
   setTimeout(function() {
@@ -42,7 +47,7 @@ function addSite(e) {
     })
     .catch(err => {
       showAlert(err);
-      console.log("Something went wrong");
+      console.log("Something went wrong", err);
     });
 }
 function loadSites() {
@@ -53,11 +58,14 @@ function loadSites() {
     .then(function(data) {
       console.log(JSON.stringify(data));
       renderUrlStatus(data);
-      document.querySelector("#last-checked-at").innerHTML = new Date();
+      if (document.querySelector("#last-checked-at")) {
+        console.log(document.querySelector("#last-checked-at"));
+        document.querySelector("#last-checked-at").innerHTML = new Date();
+      }
     })
     .catch(err => {
       showAlert(err);
-      console.log("Something went wrong");
+      console.log("Something went wrong", err);
     });
 }
 function removeSite(e) {
