@@ -32,16 +32,17 @@ func getURLWorker(siteChan chan map[string]string) {
 		client := http.Client{
 			Timeout: timeout,
 		}
+		status := false
 		resp, err := client.Get(s["url"])
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("%s", err)
+		} else {
+			status = getStatus(resp)
 		}
 
-		if err != nil {
-			panic(err)
-		}
+		fmt.Print("status ", strconv.FormatBool(status))
 
-		updateSite(resp, s)
+		updateSite(status, s)
 
 		_ = resp
 		_ = err
@@ -60,13 +61,12 @@ func getStatus(resp *http.Response) bool {
 	return status
 }
 
-func updateSite(resp *http.Response, s map[string]string) {
-
-	status := getStatus(resp)
+func updateSite(status bool, s map[string]string) {
 
 	url := baseURL + s["uuid"]
 
-	var jsonStr = []byte(`{"IsHealthy": ` + strconv.FormatBool(status) + `}`)
+	var jsonStr = []byte(`{"isHealthy": ` + strconv.FormatBool(status) + `}`)
+	fmt.Printf(s["uuid"], ` :  {"isHealthy": `+strconv.FormatBool(status)+`}`)
 	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -74,10 +74,11 @@ func updateSite(resp *http.Response, s map[string]string) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		log.Fatal("Update site failed", s["uuid"], err)
+		fmt.Print("\nUpdate site failed", s["uuid"], err)
+	} else {
+		print(resp.Status)
 	}
 
-	print(resp.Status)
 }
 
 // FetchAllSites fetch all the sites stored in the application
@@ -85,16 +86,16 @@ func FetchAllSites() ([]map[string]string, error) {
 	resp, err := http.Get(baseURL)
 
 	if err != nil {
-		fmt.Printf("%s", err)
+		fmt.Printf("\n%s", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Printf("%s", err)
+		fmt.Printf("\n%s", err)
 		return nil, err
 	}
-	fmt.Printf("%s\n", string(contents))
+	fmt.Printf("\n%s\n", string(contents))
 
 	var siteMap []map[string]string
 

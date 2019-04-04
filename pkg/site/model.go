@@ -16,5 +16,10 @@ type Site struct {
 	IsHealthy bool          `bson:"is_healthy,omitempty" json:"isHealthy,omitempty"`
 }
 
+type SitePatch struct {
+	UpdatedAt time.Time `bson:"updated_at,omitempty" json:"updatedAt,omitempty"`
+	IsHealthy bool      `bson:"is_healthy,omitempty" json:"isHealthy,omitempty"`
+}
+
 //Sites is an array of Site
 type Sites []Site
