@@ -9,8 +9,9 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"sync"
 	"time"
+
+	"github.com/abhiche/health-check/pkg/waitgroup"
 )
 
 type site struct {
@@ -21,32 +22,27 @@ type site struct {
 // Concurrent requests
 const workersCount = 10
 
-const healthCheckTimeout = 800 * time.Millisecond
+var healthCheckTimeout = 800 * time.Millisecond
 
 var baseURL = os.Getenv("BASE_URL")
 
-func getURLWorker(siteChan chan map[string]string) {
-	for s := range siteChan {
-		println(s["url"])
-		timeout := time.Duration(healthCheckTimeout)
-		client := http.Client{
-			Timeout: timeout,
-		}
-		status := false
-		resp, err := client.Get(s["url"])
-		if err != nil {
-			fmt.Printf("%s", err)
-		} else {
-			status = getStatus(resp)
-		}
-
-		fmt.Print("status ", strconv.FormatBool(status))
-
-		updateSite(status, s)
-
-		_ = resp
-		_ = err
+func getURLWorker(s map[string]string) {
+	println("\n", s["url"])
+	timeout := time.Duration(healthCheckTimeout)
+	client := http.Client{
+		Timeout: timeout,
 	}
+	status := false
+	resp, err := client.Get(s["url"])
+	if err != nil {
+		fmt.Printf("\n%s", err)
+	} else {
+		status = getStatus(resp)
+	}
+
+	fmt.Print("status ", strconv.FormatBool(status))
+
+	updateSite(status, s)
 }
 
 func getStatus(resp *http.Response) bool {
@@ -116,24 +112,17 @@ func main() {
 		return
 	}
 
-	var wg sync.WaitGroup
-	urlChan := make(chan map[string]string)
+	wg := waitgroup.NewWaitGroup(workersCount)
 
-	wg.Add(workersCount)
-
-	for i := 0; i < workersCount; i++ {
-		go func() {
-			getURLWorker(urlChan)
+	for _, s := range siteMap {
+		wg.BlockAdd()
+		println("Adding wait group")
+		go func(s map[string]string) {
+			println("Calling URL worker")
+			getURLWorker(s)
 			wg.Done()
-		}()
+		}(s)
 	}
-
-	completed := 0
-	for _, each := range siteMap {
-		urlChan <- each
-		completed++
-	}
-	close(urlChan)
 
 	wg.Wait()
 }

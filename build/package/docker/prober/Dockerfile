@@ -14,6 +14,8 @@ COPY $WORKDIR/internal/prober/cronjobs /etc/crontabs/root
 
 RUN git config --global url."git://".insteadOf https://
 
+RUN go get github.com/abhiche/health-check/pkg/waitgroup
+
 RUN go build ./internal/prober
 
 RUN chmod +x ./prober
